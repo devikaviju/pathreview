@@ -24,3 +24,50 @@ After GET /health uses settings.redis_url to verify the Redis connection and ret
 It's tier 1 issue. The bug has a clear root cause and requires a minor fix in a single file (api/routes/health.py) to swap out settings.redis_host / redis_port in favor of settings.redis_url (plus adding or updating a test file).
 I opened api/routes/health.py and core/config.py. I found that health.py references nonexistent attributes on the settings object. Looking at the test suite, there are currently no automated unit tests specifically covering the /health endpoint, so a test needs to be written to verify both healthy and degraded states.
 I'm fine with the number of claims and the fix and corresponding test should take around 4 hours.
+
+## Week 8 — Reproduction & solution planning
+
+**Reproduction commit link:** https://github.com/devikaviju/pathreview/commit/30e4007
+
+**Reproduction summary:**
+I ran `curl http://localhost:8000/health` against a
+running stack and saw `"redis":"unhealthy"` while the Redis container was up;
+the log showed `'Settings' object has no attribute 'redis_host'`. The test file
+in the linked commit fails 2/4 against the pre-fix code.
+
+**PLAN.md link:** https://github.com/devikaviju/pathreview/blob/fix/155-health-check-redis-host/PLAN.md
+
+**Blockers or open questions:**
+[Or leave blank.]
+
+## Week 9 — Solution building & PR submission
+
+### Check-in 1 (mid-week)
+
+**Current progress:**
+[what you implemented]
+
+**Next steps:**
+[what was left]
+
+**Blockers:**
+[or blank]
+
+---
+
+### Check-in 2 (end of week)
+
+**PR link:** https://github.com/ascherj/pathreview/pull/384
+
+**Branch:** `fix/155-health-check-redis-host`
+
+**What you built:**
+[1–3 sentences]
+
+**Tests added or updated:**
+[tests/unit/test_health.py, 4 tests, what they cover]
+
+**Self-review confirmation:** [x] make check passes  [x] make test-unit passes
+(no new failures — see PR description for pre-existing failure counts)
+
+**Draft PR feedback received from:** none
