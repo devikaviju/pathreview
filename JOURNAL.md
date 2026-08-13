@@ -71,3 +71,31 @@ Added tests/unit/test_health.py with 4 unit tests using pytest and unittest.mock
 [ ] make check — fails on ~179 pre-existing ruff errors in tests/unit/ and missing mypy stubs; no errors introduced by this change (verified: `make lint` and `make typecheck` report nothing in tests/unit/test_health.py)
 
 **Draft PR feedback received from:** I didn't recieve any feedback
+
+## Week 10 — Iteration & reflection
+
+### Reviewer feedback
+
+**Feedback received:** [] Yes  [x] No — still awaiting review. Someone commented "is it correct". Not sure whether it is an actual reviewer.
+
+Summary of feedback:
+No feedback.
+
+How you responded:
+No response.
+
+Reflection
+What was harder than you expected?
+Debugging silent code failures wrapped in broad exception handlers. Because the health probe caught all general Exception instances and logged them as a degraded component status, the app appeared to run fine on startup, masking an underlying AttributeError until GET /health was explicitly invoked.
+
+What did you learn about working in a large codebase?
+I learned the importance of tracing configuration models across modules before making assumptions about properties. In a large codebase, existing settings models often consolidate connection details into single string representations (like redis_url), so verifying the schema in core/config.py was essential before modifying endpoint logic.
+
+How did AI tools help — and where did they fall short?
+AI tools were very helpful for quickly generating test cases using unittest.mock to simulate both healthy and failing Redis PING responses. However, they fell short in understanding how pre-existing suite failures interacted with local test runs, requiring manual investigation of existing environment issues versus new code behavior.
+
+What would you do differently if you started over?
+I would run a full suite check (make check and make test-unit) right at the beginning of reproduction to establish a clear baseline of pre-existing test failures before writing any new code or unit tests.
+
+What are you most proud of from this module?
+Writing comprehensive unit tests with mocks that cover both healthy (200 OK) and unhealthy/degraded states, ensuring high test coverage for the /health endpoint so this dormant bug won't regress.
