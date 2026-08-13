@@ -16,7 +16,7 @@ Once fixed, GET /health will successfully read settings.redis_url to connect to 
 
 **Setup confirmation:** [x] App runs locally at localhost:5173
 
-**Cohort ledger:** [ ] Issue added to cohort ledger
+**Cohort ledger:** [x] Issue added to cohort ledger
 
 **"Is this right for me?" checklist notes:**
 Before GET /health reports Redis as unhealthy even when Redis is running, because the probe reads settings.redis_host, which doesn't exist.
@@ -38,20 +38,20 @@ in the linked commit fails 2/4 against the pre-fix code.
 **PLAN.md link:** https://github.com/devikaviju/pathreview/blob/fix/155-health-check-redis-host/PLAN.md
 
 **Blockers or open questions:**
-[Or leave blank.]
+None
 
 ## Week 9 — Solution building & PR submission
 
 ### Check-in 1 (mid-week)
 
 **Current progress:**
-[what you implemented]
+Fixed the dormant attribute error in api/routes/health.py by updating the Redis probe logic to use settings.redis_url instead of the non-existent settings.redis_host and settings.redis_port attributes.
 
 **Next steps:**
-[what was left]
+Write unit tests for the updated Redis health probe to verify healthy and degraded states, run local quality checks (make check, make test-unit), and submit the pull request.
 
 **Blockers:**
-[or blank]
+None
 
 ---
 
@@ -62,12 +62,12 @@ in the linked commit fails 2/4 against the pre-fix code.
 **Branch:** `fix/155-health-check-redis-host`
 
 **What you built:**
-[1–3 sentences]
+Updated the health check endpoint in api/routes/health.py to build the Redis client from settings.redis_url via redis.Redis.from_url() instead of referencing nonexistent host/port attributes. This resolves false "unhealthy" Redis status responses while preserving existing exception logging.
 
 **Tests added or updated:**
-[tests/unit/test_health.py, 4 tests, what they cover]
+Added tests/unit/test_health.py with 4 unit tests using pytest and unittest.mock. The tests verify that Settings defines redis_url rather than redis_host/redis_port, that the probe builds its client from redis_url, and that /health reports Redis as healthy on a successful ping and unhealthy when the ping fails.
 
-**Self-review confirmation:** [x] make check passes  [x] make test-unit passes
-(no new failures — see PR description for pre-existing failure counts)
+**Self-review confirmation:** [x] make test-unit passes (53 failed/375 passed before, 53 failed/379 passed after — same 53 pre-existing failures)
+[ ] make check — fails on ~179 pre-existing ruff errors in tests/unit/ and missing mypy stubs; no errors introduced by this change (verified: `make lint` and `make typecheck` report nothing in tests/unit/test_health.py)
 
-**Draft PR feedback received from:** none
+**Draft PR feedback received from:** I didn't recieve any feedback
